@@ -110,12 +110,15 @@ symbol_t *symtab = NULL;
  *     NULL: not exist
  */
 symbol_t *find_symbol(char *name)
-{
-    symbol_t *p = symtab;
-    while (!p)
+{   
+    symbol_t *p = symtab->next;
+    while (p != NULL)   //search
     {
+        // printf("result: %d\n", strcmp(name, p->name));
+        // printf("name: %s\n", name);
+        // printf("p->name: %s\n", p->name);
         //comare two string
-        if (strcmp(name, p->name))
+        if (strcmp(name, p->name) == 0) //same
             return p;
         //update p
         p = p->next;
@@ -135,7 +138,7 @@ symbol_t *find_symbol(char *name)
 int add_symbol(char *name)
 {
     /* check duplicate */
-    if (!find_symbol(name))
+    if (find_symbol(name) != NULL)
         return -1;
 
     /* create new symbol_t (don't forget to free it)*/
@@ -145,12 +148,12 @@ int add_symbol(char *name)
 
     /* add the new symbol_t to symbol table */
     symbol_t *p = symtab;
-    if (!symtab)
-        symtab = sym;
-    while (!p)
-    {
-        if (!p->next)
+    
+    while (p != NULL) {  //add      
+        if (p->next == NULL) {
             p->next = sym;
+            break;
+        }
         p = p->next;
     }
 
@@ -339,16 +342,14 @@ parse_t parse_symbol(char **ptr, char **name)
     int i = 0;
     //get symbol(char *)
     for (; i < 20; ++i) {
-        if (IS_LETTER((*ptr)+i))
+        if (IS_LETTER((*ptr)+i) || IS_DIGIT((*ptr)+i))
             symbolName[i] = (*ptr)[i];
         else {
             symbolName[i] = '\0';
             break;
         }
     }
-    //check   
-    if (!find_symbol(symbolName))
-        return PARSE_ERR;
+
     /* allocate name and copy to it */
     *name = symbolName;
 
@@ -375,22 +376,26 @@ parse_t parse_digit(char **ptr, long *value)
     if (!IS_DIGIT(*ptr))    //check
         return PARSE_ERR;
     char value_char[20];    //get value
-    int i = 0, base = 10;
+    int i = 0; int base = 10;
     for (; i < 20; ++i) {
         if ((*ptr)[i] == 'x') //check if hexdecimal
-            base = 16;
-        if ((*ptr)[i] != ',' && (*ptr)[i] != ' ' && (*ptr)[i] != '(')
+            base = 16;     
+        if ((*ptr)[i] != ',' && (*ptr)[i] != ' ' 
+            && (*ptr)[i] != '(' && (*ptr)[i] != '\0') {
             value_char[i] = (*ptr)[i];
+        }
         else {
             value_char[i] = '\0';
             break;
         }
     }
+    
     /* calculate the digit, (NOTE: see strtoll()) */
     /* set 'ptr' and 'value' */
     char *end = NULL;      //calculate
     (*ptr) += i;        //set ptr
-    *value = strtoll(value_char, &end, base);    //set value
+    *value = strtoul(value_char, &end, base);    //set value
+    //printf("hex: 0x%lx\n", *value);
     return PARSE_DIGIT;
 }
 
@@ -520,14 +525,17 @@ parse_t parse_data(char **ptr, char **name, long *value)
 parse_t parse_label(char **ptr, char **name)
 {
     /* skip the blank and check */
-    SKIP_BLANK(*ptr);
-    if (!IS_LETTER(*ptr))
+    SKIP_BLANK(*ptr);   //skip blank
+    if (!IS_LETTER(*ptr))   //check
         return PARSE_ERR;
     /* allocate name and copy to it */
     if (parse_symbol(ptr, name) == PARSE_ERR)   //parse 'Loop'
         return PARSE_ERR;
-    if (parse_delim(ptr, ':'))  //skip ':'
+    if (parse_delim(ptr, ':') == PARSE_ERR)  //skip ':'
         return PARSE_ERR;
+    return PARSE_LABEL;
+
+    
     /* set 'ptr' and 'name' */
 }
 
@@ -560,10 +568,25 @@ type_t parse_line(line_t *line)
         return TYPE_COMM;
     }
     /* is a label ? */
-    char *labelName = NULL;
-    if (parse_label(&ptr, &labelName) != PARSE_ERR)     //need to repair
-        return TYPE_ERR;
+    int i = 0;
+    bool_t is_label = FALSE;
+    while (!IS_END(ptr + i)) {  //check if label(have ':')
+        if (ptr[i] == ':') {
+            is_label = TRUE;
+            break;
+        }
+        ++i;   
+    }
     
+    char *labelName = NULL;
+    if (is_label && parse_label(&ptr, &labelName) != PARSE_ERR) {   //if label
+        //printf("label name: %s\n", labelName);
+        add_symbol(labelName);
+        find_symbol(labelName)->addr = vmaddr;
+        printf("addr: %d\n", find_symbol(labelName)->addr);
+        return TYPE_INS;
+    }
+        
     /* is an instruction ? */
     instr_t *instr = NULL;
     if (parse_instr(&ptr, &instr) != PARSE_ERR) {
@@ -572,9 +595,10 @@ type_t parse_line(line_t *line)
         line->y64bin.addr = vmaddr; //set addr
         vmaddr += instr->bytes;     //update vmaddr
         line->y64bin.bytes = instr->bytes;  //set bytes
-        line->y64bin.codes[0] = instr->code;    //set icode + ifun
         itype_t icode = HIGH(instr->code);   //get icode
         dtv_t ifun = LOW(instr->code);      //get ifun
+        if (icode != I_DIRECTIVE)
+            line->y64bin.codes[0] = instr->code;    //set icode + ifun
 
         switch (icode) {    //parse different instr
             //icode: I_HALT I_NOP
@@ -608,8 +632,11 @@ type_t parse_line(line_t *line)
                     return TYPE_ERR;
                 
                 line->y64bin.codes[1] = HPACK(REG_NONE, regid);   //pack 0xF and reg
-                if (name == NULL) //if digit
-                    for (int i = 2; i < 10; ++i) {   //set valC in codes[]
+                if (name != NULL) { //if symbol, set imm to its address
+                    symbol_t *sym = find_symbol(name);
+                    imm = sym->addr;
+                }
+                for (int i = 2; i < 10; ++i) {   //set imm in codes[]
                         line->y64bin.codes[i] = imm;
                         imm >>= 8;
                     }
@@ -653,10 +680,14 @@ type_t parse_line(line_t *line)
             case I_JMP:
             case I_CALL: {
                 int64_t valC;
-                if (parse_digit(&ptr, &valC) == PARSE_ERR)  //valC
+                char *dst = NULL;
+                if (parse_data(&ptr, &dst, &valC) == PARSE_ERR)  //valC
                     return TYPE_ERR;
+                if (dst != NULL) {      //symbol
+                    valC = find_symbol(dst)->addr;
+                }
                 for (int i = 2; i < 10; ++i) {   //set valC in codes[]
-                    line->y64bin.codes[i] = valC;
+                    line->y64bin.codes[i] = valC & 0xff;
                     valC  >>= 8;
                 }
                 break;
@@ -678,13 +709,13 @@ type_t parse_line(line_t *line)
                 switch (ifun) {     //parse directive code
                     //ifun: D_DATA
                     case D_DATA: {
-                        // int64_t val;
-                        // if (parse_digit(&ptr, &val) == PARSE_ERR)   //get val
-                        //     return TYPE_ERR;
-                        // for (int i = 0; i < (line->y64bin).bytes; ++i) {    //set val in code[]
-                        //     (line->y64bin).codes[i] = val;
-                        //     val >>= 8; 
-                        // }
+                        int64_t val;
+                        if (parse_digit(&ptr, &val) == PARSE_ERR)   //get val
+                            return TYPE_ERR;
+                        for (int i = 0; i < (line->y64bin).bytes; ++i) {    //set val in code[]
+                            (line->y64bin).codes[i] = val & 0xff;
+                            val >>= 8; 
+                        }
                         break;
                     }
                     //ifun: D_POS
@@ -693,6 +724,7 @@ type_t parse_line(line_t *line)
                         if (parse_digit(&ptr, &val) == PARSE_ERR)   //get val
                             return TYPE_ERR;
                         (line->y64bin).addr = val;  //set addr
+                        vmaddr = val;
                         break;
                     }
                     //ifun: D_ALIGN
@@ -805,29 +837,18 @@ int binfile(FILE *out)
 {
     /* prepare image with y64 binary code */
     line_t *line = line_head->next;
-    char bin[1024];     //store y64 binary code
-    int addr = 0;   //address for code
 
     while (line != NULL) {
-        for (int i = 0; i < (line->y64bin).bytes; ++i)    //write bin[]
-            bin[addr + i] = (line->y64bin).codes[i];
-                 
-        // printf("Function:binfile type:%d\n", line->type);
-        // printf("Function:binfile address:%d\n", addr);
-        if (line->type != TYPE_COMM)    //update addr
-            addr = (line->y64bin).addr + (line->y64bin).bytes;
-        /*update line*/
+        if (line->type == TYPE_INS) {
+            if (fseek(out, line->y64bin.addr, SEEK_SET) != 0)
+            //set bias in the file since the binary in not continuous
+                return -1;
+            fwrite(line->y64bin.codes, 1, line->y64bin.bytes, out);
+        }
         line = line->next;
     }
 
-    bin[addr] = '\0';    //set '\0'
-    printf("bin: ");
-    for (int i = 0; i < addr; ++i)
-        printf("%x", bin[i]);
-    printf("\n");
-
     /* binary write y64 code to output file (NOTE: see fwrite()) */
-    fwrite(bin, addr, 1, out);
     return 0;
 }
 
@@ -857,7 +878,7 @@ void print_line(line_t *line)
         int i;
 
         strcpy(buf, "  0x000:                      | ");
-
+        printf("y64bin->addr: %d\n", y64bin->addr);
         hexstuff(buf + 4, y64bin->addr, 3);
         if (y64bin->bytes > 0)
             for (i = 0; i < y64bin->bytes; i++)
