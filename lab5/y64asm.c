@@ -122,7 +122,7 @@ symbol_t *find_symbol(char *name)
             return p;
         //update p
         p = p->next;
-    }
+     }
     return NULL;
 }
 
@@ -142,23 +142,13 @@ int add_symbol(char *name)
         err_print("Dup symbol:%s", name);
         return -1;
     }
-
     /* create new symbol_t (don't forget to free it)*/
     symbol_t *sym = (symbol_t *) malloc(sizeof(symbol_t));
     sym->name = name;
     sym->next = NULL;
-
-    /* add the new symbol_t to symbol table */
-    symbol_t *p = symtab;
+    sym->next = symtab->next;
+    symtab->next = sym;
     
-    while (p != NULL) {  //add      
-        if (p->next == NULL) {
-            p->next = sym;
-            break;
-        }
-        p = p->next;
-    }
-
     return 0;
 }
 
@@ -174,10 +164,10 @@ void add_reloc(char *name, bin_t *bin)
 {
     /* create new reloc_t (don't forget to free it)*/
     reloc_t * reloc_ins = (reloc_t *)malloc(sizeof(reloc_t));
-    reloc_ins -> next = reltab -> next;
-    reltab -> next = reloc_ins;
-    reloc_ins -> name = name;
-    reloc_ins -> y64bin = bin;
+    reloc_ins->next = reltab -> next;
+    reltab->next = reloc_ins;
+    reloc_ins->name = name;
+    reloc_ins->y64bin = bin;
     /* add the new reloc_t to relocation table */
 }
 
@@ -307,7 +297,6 @@ parse_t parse_reg(char **ptr, regid_t *regid)
             break;
         }
     }
-    printf("reg: %s\n", reg_name);
     /* set 'ptr' and 'regid' */
     if (!find_register(reg_name))
         return PARSE_ERR;
@@ -567,8 +556,10 @@ type_t parse_line(line_t *line)
     /* skip blank and check IS_END */
     char *ptr = line->y64asm;
     SKIP_BLANK(ptr);    //skip
-    if (IS_END(ptr))    //check
-        return TYPE_ERR;
+    if (IS_END(ptr)) {   //check
+        line->type = TYPE_COMM;
+        return TYPE_COMM;
+    }
     /* is a comment ? */
     if (IS_COMMENT(ptr)) {
         line->type = TYPE_COMM;
@@ -583,17 +574,26 @@ type_t parse_line(line_t *line)
             break;
         }
         ++i;   
-    }
-    
+    }  
     char *labelName = NULL;
     if (is_label && parse_label(&ptr, &labelName) != PARSE_ERR) {   //if label
-        //printf("label name: %s\n", labelName);
         if (add_symbol(labelName) == -1)
             return TYPE_ERR;
         find_symbol(labelName)->addr = vmaddr;
-        printf("addr: %d\n", find_symbol(labelName)->addr);
-        return TYPE_INS;
+        printf("vmadddr: %d\n", vmaddr);
+        symbol_t *p = symtab->next;
+        printf("111111: %s\n", labelName);
+        while (p) {
+            printf("%s ->", p->name);
+            p = p->next;
+        }
+        printf("\n");
     }
+    // SKIP_BLANK(ptr);
+    // if (IS_END(ptr)) {
+    //     return TYPE_INS;
+    // }
+
         
     /* is an instruction ? */
     instr_t *instr = NULL;
@@ -605,8 +605,7 @@ type_t parse_line(line_t *line)
         line->y64bin.bytes = instr->bytes;  //set bytes
         itype_t icode = HIGH(instr->code);   //get icode
         dtv_t ifun = LOW(instr->code);      //get ifun
-        if (icode != I_DIRECTIVE)
-            line->y64bin.codes[0] = instr->code;    //set icode + ifun
+        line->y64bin.codes[0] = instr->code;    //set icode + ifun
 
         switch (icode) {    //parse different instr
             //icode: I_HALT I_NOP
@@ -640,12 +639,24 @@ type_t parse_line(line_t *line)
                 regid_t regid;
                 int64_t imm = 0;
                 char *name = NULL;
-                if (parse_imm(&ptr, &name, &imm)== PARSE_ERR) { //imm
-                    //err_print("Invalid Imm");
+                /* parse imm(symbol/digit)*/
+                parse_t type = parse_imm(&ptr, &name, &imm);
+                if (type == PARSE_SYMBOL) {
+                    symbol_t *sym = find_symbol(name);
+                    if (sym) {
+                        imm = sym->addr;
+                    }
+                    else {
+                        add_reloc(name, &(line->y64bin));
+                    }
+                }
+                else if (type == PARSE_ERR) {
                     return TYPE_ERR;
                 }
+               
+                /* parse imm(symbol/digit)*/
                 //printf("imm: %d\n", imm);
-                if (parse_delim(&ptr, ',') == PARSE_ERR) {//skip ','
+                if (parse_delim(&ptr, ',') == PARSE_ERR) { //skip ','
                     err_print("Invalid ','");
                     return TYPE_ERR;
                 }
@@ -655,13 +666,6 @@ type_t parse_line(line_t *line)
                 }
                 
                 line->y64bin.codes[1] = HPACK(REG_NONE, regid);   //pack 0xF and reg
-                if (name != NULL) { //if symbol, set imm to its address
-                    symbol_t *sym = find_symbol(name);
-                    if (!sym) {     //can't find it
-                        add_reloc(name, &line->y64bin);
-                    }
-                    imm = sym->addr;
-                }
                 for (int i = 2; i < 10; ++i) {   //set imm in codes[]
                         line->y64bin.codes[i] = imm;
                         imm >>= 8;
@@ -708,12 +712,11 @@ type_t parse_line(line_t *line)
                 char *dst = NULL;
                 parse_t type = parse_symbol(&ptr, &dst);
                 if (type == PARSE_ERR) {
-                    printf("wtf?\n");
                     err_print("Invalid DEST");
                     return TYPE_ERR;
                 }
                 else if (type == PARSE_SYMBOL) {
-                    add_reloc(dst, &(line->y64bin));     
+                    add_reloc(dst, &(line->y64bin));                
                 }              
                 break;
             }
@@ -739,6 +742,7 @@ type_t parse_line(line_t *line)
                         int64_t val;
                         char *dataName;
                         parse_t type = parse_data(&ptr, &dataName, &val);
+                        symbol_t *sym = find_symbol(dataName);
                         if (type == PARSE_DIGIT) {
                             for (int i = 0; i < (line->y64bin).bytes; ++i) {    //set val in code[]
                                 (line->y64bin).codes[i] = val & 0xff;
@@ -746,7 +750,7 @@ type_t parse_line(line_t *line)
                             }  
                         }
                         else if (type == PARSE_SYMBOL) {
-                            add_reloc(dataName, &(line->y64bin));
+                            add_reloc(dataName, &(line->y64bin));        
                         }
                         break;
                     }
@@ -912,7 +916,7 @@ int binfile(FILE *out)
 }
 
 /* whether print the readable output to screen or not ? */
-bool_t screen = FALSE;
+bool_t screen = TRUE;
 
 static void hexstuff(char *dest, int value, int len)
 {
@@ -937,7 +941,6 @@ void print_line(line_t *line)
         int i;
 
         strcpy(buf, "  0x000:                      | ");
-        printf("y64bin->addr: %d\n", y64bin->addr);
         hexstuff(buf + 4, y64bin->addr, 3);
         if (y64bin->bytes > 0)
             for (i = 0; i < y64bin->bytes; i++)
