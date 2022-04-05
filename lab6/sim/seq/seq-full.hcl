@@ -1,3 +1,6 @@
+# Name: Wang Shao
+# ID: 520021911427
+
 #/* $begin seq-all-hcl */
 ####################################################################
 #  HCL Description of Control for Single Cycle Y86-64 Processor SEQ   #
