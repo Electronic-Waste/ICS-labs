@@ -6,7 +6,10 @@
 # Include your name and ID here.
 # Name: Wang Shao	ID: 520021911427
 # Describe how and why you modified the baseline code.
-#
+# 1. Use "10 x 1" Loop Unrolling for data block of which size is len
+# 2. Use "2 x 1" Loop Unrolling for data block of which size is len % 10
+#	 (Process data which are not dealt with in 1)
+# 3. Deal with the last instruction (if len is odd)
 ##################################################################
 # Do not modify this portion
 # Function prologue.
@@ -15,7 +18,6 @@ ncopy:
 
 ##################################################################
 # You can modify this portion
-	xorq %rax, %rax		#count = 0
 	iaddq $-9, %rdx		#limit = len - k + 1
 	jle	Small
 
@@ -125,8 +127,8 @@ SmallNpos:
 
 Tiny:
 	iaddq $1, %rdx		# len = limit + k - 1
-	jle Done
 	mrmovq (%rdi), %r8
+	jle Done
 	rmmovq %r8, (%rsi)
 	andq %r8, %r8
 	jle Done
