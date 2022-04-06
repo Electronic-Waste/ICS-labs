@@ -15,22 +15,96 @@ ncopy:
 
 ##################################################################
 # You can modify this portion
-	# Loop header
-	xorq %rax,%rax		# count = 0;
-	andq %rdx,%rdx		# len <= 0?
-	jle Done		# if so, goto Done:
+	xorq %rax, %rax		#count = 0
+	andq %rdx, %rdx		#len <= 0 ?
+	jle Done
+	xorq %rbp, %rbp		#i = 0
+	rrmovq %rdx, %rbx	#limit
+	iaddq $-19, %rbx	#limit = len - k + 1 if limit >= k, can go to BigLoop
+	jle	Small
 
-Loop:	
-	mrmovq (%rdi), %r10	# read val from src...
-	rmmovq %r10, (%rsi)	# ...and store it to dst
-	andq %r10, %r10		# val <= 0?
-	jle Npos		# if so, goto Npos:
-	iaddq $1, %rax		# count++
-Npos:	
-	iaddq $8, %rdi		# src++
-	iaddq $8, %rsi		# dst++
-	iaddq $-1, %rdx		# len--
-	jg Loop			# if len > 0, goto Loop:
+BigLoop:
+	mrmovq (%rdi), %r10
+	rmmovq %r10, (%rsi)
+	andq %r10, %r10		#val <= 0 ?
+	jle target1
+	iaddq $1, %rax
+target1:
+	mrmovq 8(%rdi), %r10
+	rmmovq %r10, 8(%rsi)
+	andq %r10, %r10		#val <= 0 ?
+	jle target2
+	iaddq $1, %rax
+target2:
+	mrmovq 16(%rdi), %r10
+	rmmovq %r10, 16(%rsi)
+	andq %r10, %r10		#val <= 0 ?
+	jle target3
+	iaddq $1, %rax
+target3:
+	mrmovq 24(%rdi), %r10
+	rmmovq %r10, 24(%rsi)
+	andq %r10, %r10		#val <= 0 ?
+	jle target4
+	iaddq $1, %rax
+target4:
+	mrmovq 32(%rdi), %r10
+	rmmovq %r10, 32(%rsi)
+	andq %r10, %r10		#val <= 0 ?
+	jle target5
+	iaddq $1, %rax
+target5:
+	mrmovq 40(%rdi), %r10
+	rmmovq %r10, 40(%rsi)
+	andq %r10, %r10		#val <= 0 ?
+	jle target6
+	iaddq $1, %rax
+target6:
+	mrmovq 48(%rdi), %r10
+	rmmovq %r10, 48(%rsi)
+	andq %r10, %r10		#val <= 0 ?
+	jle target7
+	iaddq $1, %rax
+target7:
+	mrmovq 56(%rdi), %r10
+	rmmovq %r10, 56(%rsi)
+	andq %r10, %r10		#val <= 0 ?
+	jle target8
+	iaddq $1, %rax
+target8:
+	mrmovq 64(%rdi), %r10
+	rmmovq %r10, 64(%rsi)
+	andq %r10, %r10		#val <= 0 ?
+	jle target9
+	iaddq $1, %rax
+target9:
+	mrmovq 72(%rdi), %r10
+	rmmovq %r10, 72(%rsi)
+	andq %r10, %r10		#val <= 0 ?
+	jle BigNpos
+	iaddq $1, %rax
+BigNpos:
+	iaddq $80, %rdi		#update src
+	iaddq $80, %rsi		#update dst
+	iaddq $10, %rbp		#i += k
+	iaddq $-10, %rbx	#limit -= k
+	jg BigLoop
+
+Small:
+	subq %rbp, %rdx		# len -= i
+SmallLoop:
+	mrmovq (%rdi), %r10
+	rmmovq %r10, (%rsi)
+	andq %r10, %r10
+	jle SmallNpos
+	iaddq $1, %rax
+
+SmallNpos:
+	iaddq $8, %rdi
+	iaddq $8, %rsi
+	iaddq $-1, %rdx
+	jg SmallLoop
+
 ##################################################################
 # Do not modify the following section of code
 # Function epilogue.
