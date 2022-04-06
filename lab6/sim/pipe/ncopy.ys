@@ -20,7 +20,7 @@ ncopy:
 	jle Done
 	xorq %rbp, %rbp		#i = 0
 	rrmovq %rdx, %rbx	#limit
-	iaddq $-19, %rbx	#limit = len - k + 1 if limit >= k, can go to BigLoop
+	iaddq $-9, %rbx	#limit = len - k + 1
 	jle	Small
 
 BigLoop:
