@@ -1,3 +1,28 @@
+# Name: Wang Shao
+# ID: 520021911427
+#
+# Some Descriptions:
+# First, I add the implementation of iaddq to this file
+# iaddq V, rB
+# Fetch: 
+#		icode: ifun <- M1[PC]
+#		rA: rB <- M1[PC + 1]
+#		valC <-	M8[PC + 2]
+#		valP <- PC + 10
+# Decode: 
+#		valB <- R[rB]
+# Execute:
+#		valE <- valB + valC
+#		Set CC 
+# Memory:
+# Write Back:
+#		R[rB] <- valE
+# PC update:
+#		PC <- valP
+#
+# What we need to do is to set HCL expressions according to the 
+# behaviour of iaddq instruction as provided above.
+
 #/* $begin pipe-all-hcl */
 ####################################################################
 #    HCL Description of Control for Pipelined Y86-64 Processor     #
@@ -158,7 +183,7 @@ word f_ifun = [
 # Is instruction valid?
 bool instr_valid = f_icode in 
 	{ INOP, IHALT, IRRMOVQ, IIRMOVQ, IRMMOVQ, IMRMOVQ,
-	  IOPQ, IJXX, ICALL, IRET, IPUSHQ, IPOPQ };
+	  IOPQ, IJXX, ICALL, IRET, IPUSHQ, IPOPQ, IIADDQ };
 
 # Determine status code for fetched instruction
 word f_stat = [
@@ -171,11 +196,11 @@ word f_stat = [
 # Does fetched instruction require a regid byte?
 bool need_regids =
 	f_icode in { IRRMOVQ, IOPQ, IPUSHQ, IPOPQ, 
-		     IIRMOVQ, IRMMOVQ, IMRMOVQ };
+		     IIRMOVQ, IRMMOVQ, IMRMOVQ, IIADDQ };
 
 # Does fetched instruction require a constant word?
 bool need_valC =
-	f_icode in { IIRMOVQ, IRMMOVQ, IMRMOVQ, IJXX, ICALL };
+	f_icode in { IIRMOVQ, IRMMOVQ, IMRMOVQ, IJXX, ICALL, IIADDQ };
 
 # Predict next value of PC
 word f_predPC = [
@@ -195,14 +220,14 @@ word d_srcA = [
 
 ## What register should be used as the B source?
 word d_srcB = [
-	D_icode in { IOPQ, IRMMOVQ, IMRMOVQ  } : D_rB;
+	D_icode in { IOPQ, IRMMOVQ, IMRMOVQ, IIADDQ  } : D_rB;
 	D_icode in { IPUSHQ, IPOPQ, ICALL, IRET } : RRSP;
 	1 : RNONE;  # Don't need register
 ];
 
 ## What register should be used as the E destination?
 word d_dstE = [
-	D_icode in { IRRMOVQ, IIRMOVQ, IOPQ} : D_rB;
+	D_icode in { IRRMOVQ, IIRMOVQ, IOPQ, IIADDQ} : D_rB;
 	D_icode in { IPUSHQ, IPOPQ, ICALL, IRET } : RRSP;
 	1 : RNONE;  # Don't write any register
 ];
@@ -239,7 +264,7 @@ word d_valB = [
 ## Select input A to ALU
 word aluA = [
 	E_icode in { IRRMOVQ, IOPQ } : E_valA;
-	E_icode in { IIRMOVQ, IRMMOVQ, IMRMOVQ } : E_valC;
+	E_icode in { IIRMOVQ, IRMMOVQ, IMRMOVQ, IIADDQ } : E_valC;
 	E_icode in { ICALL, IPUSHQ } : -8;
 	E_icode in { IRET, IPOPQ } : 8;
 	# Other instructions don't need ALU
@@ -248,7 +273,7 @@ word aluA = [
 ## Select input B to ALU
 word aluB = [
 	E_icode in { IRMMOVQ, IMRMOVQ, IOPQ, ICALL, 
-		     IPUSHQ, IRET, IPOPQ } : E_valB;
+		     IPUSHQ, IRET, IPOPQ, IIADDQ } : E_valB;
 	E_icode in { IRRMOVQ, IIRMOVQ } : 0;
 	# Other instructions don't need ALU
 ];
@@ -260,7 +285,7 @@ word alufun = [
 ];
 
 ## Should the condition codes be updated?
-bool set_cc = E_icode == IOPQ &&
+bool set_cc = E_icode in {IOPQ, IIADDQ} &&
 	# State changes only during normal operation
 	!m_stat in { SADR, SINS, SHLT } && !W_stat in { SADR, SINS, SHLT };
 
