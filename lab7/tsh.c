@@ -2,7 +2,10 @@
  * tsh - A tiny shell program with job control
  * 
  * <Put your name and ID here>
+ * Name: Wang Shao
+ * ID: 520021911427
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -165,6 +168,44 @@ int main(int argc, char **argv)
 */
 void eval(char *cmdline) 
 {
+    char *argv[MAXARGS];    //Argument list execve()
+    char buf[MAXLINE];      //Holds modified command line
+    int bg;                 //Should the job run in bg or fg?
+    pid_t pid;              //Process id
+
+    strcpy(buf, cmdline);
+    bg = parseline(buf, argv) ? BG : FG;
+    if (argv[0] == NULL)
+        return;     //Ignore empty lines
+
+    if (!builtin_cmd(argv)) {
+        if ((pid = fork()) == 0) {  //child runs user job
+            if (setpgid(0, 0) < 0)          //child process use its pid as pgid
+                unix_error("setpgid: set error");
+            if (execve(argv[0], argv, environ) < 0) {
+                printf("%s: Command not found.\n", argv[0]);
+                exit(0);
+            }
+        }
+    
+        //Parent wait for foreground jobs to terminate
+        if (bg == FG) {
+            int status;
+            if (waitpid(pid, &status, 0) < 0)
+                unix_error("waitfg: waitpid error");
+            //Add child to jobs list
+            if (addjob(jobs, pid, bg, buf) == 0)
+                unix_error("addjob: can't add child to jobs list");
+        }
+        else {
+            //Add child to jobs list
+            if (addjob(jobs, pid, bg, buf) == 0)
+                unix_error("addjob: can't add child to jobs list");
+            pid_t jid = pid2jid(pid);
+            printf("[%d] (%d) %s", jid, pid, buf);
+        }
+    }
+
     return;
 }
 
@@ -231,6 +272,33 @@ int parseline(const char *cmdline, char **argv)
  */
 int builtin_cmd(char **argv) 
 {
+    //builtin_cmd: quit
+    //function: exit terminates the shell
+    if (!strcmp(argv[0], "quit"))
+        exit(0);
+
+    //buitin_cmd: fg
+    //function: restarts <job> by sending it a SIGCOUNT signal
+    //          and runs it in the foreground.
+    if (!strcmp(argv[0], "fg")) {
+        do_bgfg(argv);
+        return 1;
+    }
+
+    //builtin_cmd: bg
+    //function: restarts <job> by sending it a SIGCOUNT signal
+    //          and runs it in the background.
+    if (!strcmp(argv[0], "bg")) {
+        do_bgfg(argv);
+        return 1;
+    }
+
+    //builtin_cmd: jobs
+    //function: lists all background jobs
+    if (!strcmp(argv[0], "jobs")) {
+        listjobs(jobs);
+        return 1;
+    }
     return 0;     /* not a builtin command */
 }
 
@@ -247,6 +315,8 @@ void do_bgfg(char **argv)
  */
 void waitfg(pid_t pid)
 {
+    while(!sleep(1));
+    waitpid(pid, NULL, WNOHANG);
     return;
 }
 
@@ -273,7 +343,21 @@ void sigchld_handler(int sig)
  */
 void sigint_handler(int sig) 
 {
-    return;
+    pid_t pid;
+    if ((pid = fgpid(jobs)) == 0) {
+        unix_error("No Foreground jobs");
+        return;
+    }
+
+    struct job_t *job;
+    if ((job = getjobpid(jobs, pid)) == NULL) {
+        unix_error("getjobpid: Can't find this job");
+        return;
+    }
+    else {
+        kill(-pid, SIGINT);    //send SIGINT to the entire foreground group
+        printf("Job [%d] (%d) terminated by signal %d\n", job->jid, pid, sig);
+    }
 }
 
 /*
@@ -283,7 +367,22 @@ void sigint_handler(int sig)
  */
 void sigtstp_handler(int sig) 
 {
-    return;
+    
+    pid_t pid;
+    if ((pid = fgpid(jobs)) == 0) {         //get foreground job's pid
+        unix_error("No Foreground jobs");
+        return;
+    }
+
+    struct job_t *job;
+    if ((job = getjobpid(jobs, pid)) == NULL) {
+        unix_error("getjobpid: Can't find this job");
+        return;
+    }
+    else {
+        kill(-pid, SIGTSTP);    //send SIGTSTP to the entire foreground group
+        printf("Job [%d] (%d) terminated by signal %d\n", job->jid, pid, sig);
+    }
 }
 
 /*********************
