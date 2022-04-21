@@ -154,7 +154,7 @@ int main(int argc, char **argv)
 
     exit(0); /* control never reaches here */
 }
-  
+
 /* 
  * eval - Evaluate the command line that the user has just typed in
  * 
@@ -172,40 +172,48 @@ void eval(char *cmdline)
     char buf[MAXLINE];      //Holds modified command line
     int bg;                 //Should the job run in bg or fg?
     pid_t pid;              //Process id
+    sigset_t mask_all, mask_one, prev_one;  //Mask
+
+    sigfillset(&mask_all);
+    sigemptyset(&mask_one);
+    sigaddset(SIGCHLD, &mask_one);
 
     strcpy(buf, cmdline);
-    bg = parseline(buf, argv) ? BG : FG;
+    bg = parseline(buf, argv);
+
     if (argv[0] == NULL)
         return;     //Ignore empty lines
 
+    sigprocmask(SIG_BLOCK, &mask_one, &prev_one);   //block SIGCHLD
     if (!builtin_cmd(argv)) {
         if ((pid = fork()) == 0) {  //child runs user job
+            sigprocmask(SIG_SETMASK, &prev_one, NULL);  //unblock SIGCHLD
             if (setpgid(0, 0) < 0)          //child process use its pid as pgid
                 unix_error("setpgid: set error");
+            signal(SIGTSTP, SIG_DFL);
+            signal(SIGINT, SIG_DFL);
             if (execve(argv[0], argv, environ) < 0) {
                 printf("%s: Command not found.\n", argv[0]);
                 exit(0);
             }
         }
-    
-        //Parent wait for foreground jobs to terminate
-        if (bg == FG) {
-            int status;
-            if (waitpid(pid, &status, 0) < 0)
-                unix_error("waitfg: waitpid error");
-            //Add child to jobs list
-            if (addjob(jobs, pid, bg, buf) == 0)
-                unix_error("addjob: can't add child to jobs list");
+
+        //Parent wait for foreground jobs to terminate        
+        if (!bg) {     
+            addjob(jobs, pid, FG, buf);
+            sigprocmask(SIG_SETMASK, &prev_one, NULL);  //Unblock SIGCHLD
+            waitfg(pid);
         }
         else {
-            //Add child to jobs list
-            if (addjob(jobs, pid, bg, buf) == 0)
-                unix_error("addjob: can't add child to jobs list");
+            addjob(jobs, pid, BG, buf);
+            sigprocmask(SIG_SETMASK, &prev_one, NULL);  //Unblock SIGCHLD
             pid_t jid = pid2jid(pid);
             printf("[%d] (%d) %s", jid, pid, buf);
         }
+        
     }
-
+    // printf("pid: %d\n", pid);
+    fflush(stdout);
     return;
 }
 
@@ -315,8 +323,9 @@ void do_bgfg(char **argv)
  */
 void waitfg(pid_t pid)
 {
-    while(!sleep(1));
-    waitpid(pid, NULL, WNOHANG);
+    // printf("fgpid: %d\n", fgpid(jobs));
+    while(fgpid(jobs) == pid) 
+        sleep(1);
     return;
 }
 
@@ -333,6 +342,21 @@ void waitfg(pid_t pid)
  */
 void sigchld_handler(int sig) 
 {
+    pid_t pid;
+    int status;
+    sigset_t mask_all, prev_all;
+
+    sigemptyset(&mask_all);
+    sigfillset(&mask_all);
+
+    sigprocmask(SIG_BLOCK, &mask_all, &prev_all);
+    if ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0) {
+        if (!WIFSTOPPED(status))
+            deletejob(jobs, pid);
+    }
+    sigprocmask(SIG_SETMASK, &prev_all, NULL);
+    // listjobs(jobs);
+    // printf("work! pid:%d\n", pid);
     return;
 }
 
@@ -344,17 +368,10 @@ void sigchld_handler(int sig)
 void sigint_handler(int sig) 
 {
     pid_t pid;
-    if ((pid = fgpid(jobs)) == 0) {
-        unix_error("No Foreground jobs");
-        return;
-    }
+    pid = fgpid(jobs);
 
-    struct job_t *job;
-    if ((job = getjobpid(jobs, pid)) == NULL) {
-        unix_error("getjobpid: Can't find this job");
-        return;
-    }
-    else {
+    struct job_t *job = getjobpid(jobs, pid);
+    if (job->state == FG) {
         kill(-pid, SIGINT);    //send SIGINT to the entire foreground group
         printf("Job [%d] (%d) terminated by signal %d\n", job->jid, pid, sig);
     }
@@ -369,19 +386,13 @@ void sigtstp_handler(int sig)
 {
     
     pid_t pid;
-    if ((pid = fgpid(jobs)) == 0) {         //get foreground job's pid
-        unix_error("No Foreground jobs");
-        return;
-    }
+    pid = fgpid(jobs);
 
-    struct job_t *job;
-    if ((job = getjobpid(jobs, pid)) == NULL) {
-        unix_error("getjobpid: Can't find this job");
-        return;
-    }
-    else {
+    struct job_t *job = getjobpid(jobs, pid);
+    if (job->state == FG) {
         kill(-pid, SIGTSTP);    //send SIGTSTP to the entire foreground group
-        printf("Job [%d] (%d) terminated by signal %d\n", job->jid, pid, sig);
+        job->state = ST;
+        printf("Job [%d] (%d) stopped by signal %d\n", job->jid, pid, sig);
     }
 }
 
