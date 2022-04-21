@@ -315,6 +315,36 @@ int builtin_cmd(char **argv)
  */
 void do_bgfg(char **argv) 
 {
+    int bg;             /* background job? */
+    pid_t jid;          /* job id */
+    pid_t pid;          /* process id */
+    struct job_t *job;  /* job */
+    
+    bg = (strcmp(argv[0], "fg") == 0) ? 0 : 1;
+    if (argv[1][0] == '%') {
+        jid = argv[1][1] - '0';
+        job = getjobjid(jobs, jid);
+        if (job == NULL)
+            return;
+    }
+    else {
+        pid = strtol(argv[1], NULL, 10);
+        job = getjobpid(jobs, pid);
+        if (job == NULL)
+            return;
+    }
+
+    kill(-job->pid, SIGCONT);
+    if (!bg) {
+        job->state = FG;
+        waitfg(job->pid);
+    }
+    else {
+        job->state = BG;
+        printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
+    }
+
+
     return;
 }
 
