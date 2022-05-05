@@ -37,7 +37,7 @@ void build_cache()
     int set_num = 2 << index_bits;
     int ass_num = ass_num;
 
-    cache = (set_t *) malloc(sizeof(line_t) * set_num);
+    cache = (set_t *) malloc(sizeof(set_t) * set_num);
     for (int i = 0; i < set_num; ++i) {
         cache[i].used = (int *) malloc(sizeof(int) * ass_num);
         cache[i].lineGrp = (line_t *) malloc(sizeof(line_t) * ass_num);
@@ -75,7 +75,6 @@ int getBlock(long addr)
 
 void load(long addr, int size)
 {
-    int ass_num = ass_num;
     int tag = getTag(addr);
     int set_index = getSet(addr);
     int block_offset = getBlock(addr);
@@ -85,6 +84,7 @@ void load(long addr, int size)
     bool hasEmptyLine = false;
     for (int i = 0; i < ass_num; ++i) {
         line_t line = cache[set_index].lineGrp[i];
+        // printf("line valid: %d tag:%d block:%d\n", line.valid, line.tag, line.block);
         index = (cache[set_index].used[i] >= cache[set_index].used[index]) ? i : index; //LRU index
         if (line.valid == 0) hasEmptyLine = true;       //check if exists empty line
         
@@ -123,13 +123,12 @@ void load(long addr, int size)
         ++eviction_count;
         if (verbose) printf("L %lx,%d miss eviction\n", addr, size);
     }
-
+    //printf("eviction: %d\n", eviction_count);
 
 }
 
 void store(long addr, int size)
 {
-    int ass_num = ass_num;
     int tag = getTag(addr);
     int set_index = getSet(addr);
     int block_offset = getBlock(addr);
@@ -139,6 +138,7 @@ void store(long addr, int size)
     bool hasEmptyLine = false;
     for (int i = 0; i < ass_num; ++i) {
         line_t line = cache[set_index].lineGrp[i];
+        //printf("line valid: %d tag:%d block:%d\n", line.valid, line.tag, line.block);
         index = (cache[set_index].used[i] >= cache[set_index].used[index]) ? i : index; //LRU index
         if (line.valid == 0) hasEmptyLine = true;       //check if exists empty line
         
@@ -179,11 +179,12 @@ void store(long addr, int size)
         ++eviction_count;
         if (verbose) printf("S %lx,%d miss eviction\n", addr, size);
     }
+    //printf("eviction: %d\n", eviction_count);
 }
 
 void modify(long addr, int size)
 {
-    printf("M: \n");
+    if (verbose) printf("M: \n");
     load(addr, size);
     store(addr, size);
 }
@@ -202,15 +203,15 @@ int main(int argc, char *argv[])
             break;
         case 's':
             index_bits = atoi(optarg);
-            printf("index_bits: %d\n", index_bits);
+            //printf("index_bits: %d\n", index_bits);
             break;
         case 'E':
             ass_num = atoi(optarg);
-            printf("ass_num: %d\n", ass_num);
+            //printf("ass_num: %d\n", ass_num);
             break;
         case 'b':
             block_bits = atoi(optarg);
-            printf("block_bits: %d\n", block_bits);
+            //printf("block_bits: %d\n", block_bits);
             break;
         case 't':
             strcpy(input_path, optarg);
@@ -255,9 +256,10 @@ int main(int argc, char *argv[])
                 modify(address, size);
                 break;
         }
+        //printf("address: %ld size: %d tag: %x set: %x block: %x\n", address, size, getTag(address), getSet(address), getBlock(address));
     }
     
 
-    printSummary(index_bits, miss_count, block_bits);
+    printSummary(hit_count, miss_count, eviction_count);
     return 0;
 }
