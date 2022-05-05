@@ -1,3 +1,5 @@
+// name: Wang Shao
+// ID: 520021911427
 /* 
  * trans.c - Matrix transpose B = A^T
  *
