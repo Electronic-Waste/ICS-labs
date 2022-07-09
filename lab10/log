@@ -1,0 +1,1078 @@
+Function: mm_init
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653000288
+Address: 140485653000288 size: 4096 ->
+
+Checker: print_heap
+size: 8 a ->size: 4096 f ->
+
+Function: mm_malloc size: 520
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653000808
+Address: 140485653000808 size: 3576 ->
+
+Checker: print_heap
+size: 8 a ->size: 520 a ->size: 3576 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653000944
+Address: 140485653000944 size: 3440 ->
+
+Checker: print_heap
+size: 8 a ->size: 520 a ->size: 136 a ->size: 3440 f ->
+
+Function: mm_malloc size: 656
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653001600
+Address: 140485653001600 size: 2784 ->
+
+Checker: print_heap
+size: 8 a ->size: 520 a ->size: 136 a ->size: 656 a ->size: 2784 f ->
+
+Function: mm_free size: 520
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 140485653000288
+Address: 140485653000288 size: 520 ->
+Free list 6: 0
+
+Free list 7: 140485653001600
+Address: 140485653001600 size: 2784 ->
+
+Checker: print_heap
+size: 8 a ->size: 520 f ->size: 136 a ->size: 656 a ->size: 2784 f ->
+
+Function: mm_realloc size: 648
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 140485653000288
+Address: 140485653000288 size: 520 ->
+Free list 6: 0
+
+Free list 7: 140485653001600
+Address: 140485653001600 size: 2784 ->
+
+Checker: print_heap
+size: 8 a ->size: 520 f ->size: 136 a ->size: 656 a ->size: 2784 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 140485653000424
+Address: 140485653000424 size: 384 ->
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653001600
+Address: 140485653001600 size: 2784 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 384 f ->size: 136 a ->size: 656 a ->size: 2784 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 140485653000424
+Address: 140485653000424 size: 520 ->
+Free list 6: 0
+
+Free list 7: 140485653001600
+Address: 140485653001600 size: 2784 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 520 f ->size: 656 a ->size: 2784 f ->
+
+Function: mm_realloc size: 776
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 0
+
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 140485653000288
+Address: 140485653000288 size: 136 ->
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 f ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004384
+Address: 140485653004384 size: 4096 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 4096 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 140485653000288
+Address: 140485653000288 size: 136 ->
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 f ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004384
+Address: 140485653004384 size: 4096 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 4096 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 140485653000288
+Address: 140485653000288 size: 136 ->
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 f ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004384
+Address: 140485653004384 size: 4096 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 4096 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 140485653000288
+Address: 140485653000288 size: 136 ->
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 f ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004384
+Address: 140485653004384 size: 4096 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 4096 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 140485653000288
+Address: 140485653000288 size: 136 ->
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 f ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004384
+Address: 140485653004384 size: 4096 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 4096 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 140485653000288
+Address: 140485653000288 size: 136 ->
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 f ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004384
+Address: 140485653004384 size: 4096 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 4096 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 140485653000288
+Address: 140485653000288 size: 136 ->
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 f ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004384
+Address: 140485653004384 size: 4096 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 4096 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 140485653000288
+Address: 140485653000288 size: 136 ->
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 f ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004384
+Address: 140485653004384 size: 4096 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 4096 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 140485653000288
+Address: 140485653000288 size: 136 ->
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 f ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004384
+Address: 140485653004384 size: 4096 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 4096 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 140485653000288
+Address: 140485653000288 size: 136 ->
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 f ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_malloc size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004520
+Address: 140485653004520 size: 3960 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 136 a ->size: 3960 f ->
+
+Function: mm_free size: 136
+Checker: print_freeList
+Free list 0: 0
+
+Free list 1: 0
+
+Free list 2: 0
+
+Free list 3: 0
+
+Free list 4: 0
+
+Free list 5: 0
+
+Free list 6: 0
+
+Free list 7: 140485653004384
+Address: 140485653004384 size: 4096 ->
+
+Checker: print_heap
+size: 8 a ->size: 136 a ->size: 3960 a ->size: 4096 f ->
+
